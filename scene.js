@@ -37379,56 +37379,68 @@ THREE.CSS3DRenderer = function () {
 
 /////
 
+//Three.js
+import * as THREE from 'three';
 
-// MAIN
+import FirstPersonControls from './fpscontrols';
+FirstPersonControls(THREE);
 
-// standard global variables
-var container, scene, camera, renderer, controls, stats;
-var keyboard = new THREEx.KeyboardState();
-var clock = new THREE.Clock();
-// custom global variables
-var rendererCSS;
-// custom global variables
-var cube;
+// Event emitter implementation for ES6
+import EventEmitter from 'event-emitter-es6';
 
-init();
-animate();
+class Scene extends EventEmitter {
+  constructor(domElement = document.getElementById('gl_context'),
+              _width = window.innerWidth,
+              _height = window.innerHeight,
+              hasControls = true,
+              clearColor = 'black'){
 
-// FUNCTIONS 		
-function init() 
-{
-	// SCENE
-	scene = new THREE.Scene();
-	// CAMERA
-	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
-	var VIEW_ANGLE = 55, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 2000, FAR = 400000;
-	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
-	scene.add(camera);
-	camera.position.set(4000, 4200,12000);
-	camera.lookAt(scene.position);	
-	// RENDERER
-	if ( Detector.webgl )
-		renderer = new THREE.WebGLRenderer( {antialias:true} );
-	else
-		renderer = new THREE.CanvasRenderer(); 
-	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	container = document.getElementById( 'ThreeJS' );
-	container.appendChild( renderer.domElement );
-	// EVENTS
-	THREEx.WindowResize(renderer, camera);
-	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
-	// CONTROLS
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
-	// STATS
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.bottom = '0px';
-	stats.domElement.style.zIndex = 100;
-	container.appendChild( stats.domElement );
-	// LIGHT
-//	var light = new THREE.PointLight(0xffffff);
-//	light.position.set(0,250,0);
-//	scene.add(light);
+    //Since we extend EventEmitter we need to instance it from here
+    super();
+
+    //THREE scene
+    this.scene = new THREE.Scene();
+
+    //Utility
+    this.width = _width;
+    this.height = _height;
+
+    //THREE Camera
+    this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.1, 1000);
+
+    //THREE WebGL renderer
+    this.renderer = new THREE.WebGLRenderer({
+      antialiasing: true
+    });
+
+    this.renderer.setClearColor(new THREE.Color(clearColor));
+
+    this.renderer.setSize(this.width, this.height);
+
+    //Push the canvas to the DOM
+    domElement.append(this.renderer.domElement);
+
+    if(hasControls){
+      this.controls = new THREE.FirstPersonControls(this.camera, this.renderer.domElement);
+      this.controls.lookSpeed = 0.05;
+    }
+
+    //Setup event listeners for events and handle the states
+    window.addEventListener('resize', e => this.onWindowResize(e), false);
+    domElement.addEventListener('mouseenter', e => this.onEnterCanvas(e), false);
+    domElement.addEventListener('mouseleave', e => this.onLeaveCanvas(e), false);
+    window.addEventListener('keydown', e => this.onKeyDown(e), false);
+
+    this.helperGrid = new THREE.GridHelper( 10, 10 );
+    this.helperGrid.position.y = -0.5;
+    this.scene.add(this.helperGrid);
+    this.clock = new THREE.Clock();
+
+
+
+/*
+
+
 	// FLOOR
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
@@ -37700,31 +37712,63 @@ function init()
 
 
 
-	
+*/
+
+
+
+
+
+
+    this.update();
+
+  }
+
+  drawUsers(positions, id){
+    for(let i = 0; i < Object.keys(positions).length; i++){
+      if(Object.keys(positions)[i] != id){
+        this.users[i].position.set(positions[Object.keys(positions)[i]].position[0],
+                                   positions[Object.keys(positions)[i]].position[1],
+                                   positions[Object.keys(positions)[i]].position[2]);
+      }
+    }
+  }
+
+  update(){
+    requestAnimationFrame(() => this.update());
+    this.controls.update(this.clock.getDelta());
+    this.controls.target = new THREE.Vector3(0,0,0);
+    this.render();
+  }
+
+  render() {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  onWindowResize(e) {
+    this.width = window.innerWidth;
+    this.height = Math.floor(window.innerHeight - (window.innerHeight * 0.3));
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(this.width, this.height);
+  }
+
+  onLeaveCanvas(e){
+    this.controls.enabled = false;
+  }
+  onEnterCanvas(e){
+    this.controls.enabled = true;
+  }
+  onKeyDown(e){
+    this.emit('userMoved');
+  }
 }
 
-function animate() 
-{
-    requestAnimationFrame( animate );
-	render();		
-	update();
-}
+export default Scene;
 
-function update()
-{
-	if ( keyboard.pressed("z") ) 
-	{ 
-		// do something
-	}
-	
-	controls.update();
-	stats.update();
-}
 
-function render() 
-{
-	// remember to call both renderers!
-	rendererCSS.render( cssScene, camera );
-	renderer.render( scene, camera );
-	rendererCSS.render( cssScene2, camera );
-}
+
+
+
+
+
+
