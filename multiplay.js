@@ -1,7 +1,10 @@
-window.onload=function(){
 
-// best way to un-global this ...?
-socket = io.connect();
+
+window.onload=function(){ 
+
+ // best way to un-global this ...? 
+     socket = io.connect(); 
+
 
 
             Math.seedrandom('def')
@@ -9,6 +12,13 @@ socket = io.connect();
             var players = [];
 
             var stats;
+
+
+// custom global variables
+var rendererCSS;
+// custom global variables
+var cube;
+
 
             scene = '';
             var camera, renderer //, scene;
@@ -19,6 +29,7 @@ socket = io.connect();
 
             var ray;
             var camera;
+
 
             var blocker = document.getElementById( 'blocker' );
             var instructions = document.getElementById( 'instructions' );
@@ -171,33 +182,33 @@ if (!slave) slave = 0
 //
 //
 //
-var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
+var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 10, 10 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(6200, 4400, 10, 10);
+	var floorGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
+	floor.position.y = 3;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/moontop.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/moontop.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1, 1);
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(10200, 14400, 10, 10);
+	var floorGeometry = new THREE.PlaneGeometry(400, 400, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -45;
+	floor.position.y = 2;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/sea.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'sea.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1.2,1.2 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-	var floorGeometry = new THREE.PlaneGeometry(255200, 254400, 10, 10);
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -220;
+	floor.position.y = 1.2;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 
@@ -208,12 +219,14 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 // axes
 	var axes = new THREE.AxisHelper(100);
+	axes.position.y = 4;
+
 	scene.add( axes );
 	
-	var imagePrefix = "images/dawnmountain-";
+	var imagePrefix = "/var/www/multiplay/js/dawnmountain-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
-	var skyGeometry = new THREE.CubeGeometry(25500, 7700, 25500 );	
+	var skyGeometry = new THREE.CubeGeometry(500, 500, 500 );	
 	
 	var materialArray = [];
 	for (var i = 0; i < 6; i++)
@@ -225,10 +238,10 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
 	
-	var imagePrefix = "images/nebula-";
+	var imagePrefix = "nebula-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
-	var skyGeometry = new THREE.CubeGeometry(44500, 44500, 45500 );	
+	var skyGeometry = new THREE.CubeGeometry(1000, 498, 1000 );	
 	
 	var materialArray = [];
 	for (var i = 0; i < 6; i++)
@@ -247,13 +260,13 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 	//backwall
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x32cd32, side: THREE.DoubleSide });
-	var planeWidth = 6200;
-        var planeHeight = 4200;
+	var planeWidth = 62;
+        var planeHeight = 42;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
 	planeMesh.position.x += 0;
-	planeMesh.position.y += 1100;
-	planeMesh.position.z += -2200;
+	planeMesh.position.y += 11;
+	planeMesh.position.z += -22;
 	planeMesh.rotation.x = 0;
 	planeMesh.rotation.y = 0;
 	// add it to the standard (WebGL) scene
@@ -261,13 +274,13 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 	//frontwall
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0xede5d1, side: THREE.DoubleSide });
-	var planeWidth = 5200;
-        var planeHeight = 600;
+	var planeWidth = 52;
+        var planeHeight = 6;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
 	planeMesh.position.x += 0;
-	planeMesh.position.y += 3300;
-	planeMesh.position.z += 2200;
+	planeMesh.position.y += 33;
+	planeMesh.position.z += 22;
 	planeMesh.rotation.x = 0;
 	planeMesh.rotation.y = 0;
 	// add it to the standard (WebGL) scene
@@ -276,12 +289,12 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 	//sidewall1closed
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x32cd32, side: THREE.DoubleSide });
-	var planeWidth = 5200;
-        var planeHeight = 4400;
+	var planeWidth = 52;
+        var planeHeight = 44;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
-	planeMesh.position.x += 3100;
-	planeMesh.position.y += 1100;
+	planeMesh.position.x += 31;
+	planeMesh.position.y += 11;
 	planeMesh.position.z += 0;
 	planeMesh.rotation.x = Math.PI / 2;
 	planeMesh.rotation.y = Math.PI / 2;
@@ -290,12 +303,12 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 	//sidewallopen
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x32cd32, side: THREE.DoubleSide });
-	var planeWidth = 5200;
-        var planeHeight = 4400;
+	var planeWidth = 52;
+        var planeHeight = 44;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
-	planeMesh.position.x += -3100;
-	planeMesh.position.y += 1100;
+	planeMesh.position.x += -31;
+	planeMesh.position.y += 11;
 	planeMesh.position.z += 0;
 	planeMesh.rotation.x = Math.PI / 2;
 	planeMesh.rotation.y = Math.PI / 2;
@@ -306,13 +319,13 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 	//roof
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.DoubleSide });
-	var planeWidth = 7000;
-        var planeHeight = 3400;
+	var planeWidth = 70;
+        var planeHeight = 34;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
 	planeMesh.position.x += 0;
-	planeMesh.position.y += 4200;
-	planeMesh.position.z += -1000;
+	planeMesh.position.y += 42;
+	planeMesh.position.z += -12;
 	planeMesh.rotation.x = Math.PI / 4;
 	planeMesh.rotation.y = 0;
 	// add it to the standard (WebGL) scene
@@ -320,13 +333,13 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 	//roof
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.DoubleSide });
-	var planeWidth = 7000;
-        var planeHeight = 3400;
+	var planeWidth = 70;
+        var planeHeight = 34;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
 	planeMesh.position.x += 0;
-	planeMesh.position.y += 4200;
-	planeMesh.position.z += 1200;
+	planeMesh.position.y += 42;
+	planeMesh.position.z += 12;
 	planeMesh.rotation.x = Math.PI / -4;
 	planeMesh.rotation.y = 0;
 	// add it to the standard (WebGL) scene
@@ -336,6 +349,61 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 //
 //                
 
+///TV.s/// //tvone 
+
+//tvone
+	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
+	var planeWidth = 32;
+        var planeHeight = 32;
+	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
+	planeMesh.position.x += -10;
+	planeMesh.position.y += 2;
+	planeMesh.position.z +=-14 ;
+	// add it to the standard (WebGL) scene
+	scene.add(planeMesh);
+	
+	// create a new scene to hold CSS
+	cssScene = new THREE.Scene();
+	// create the iframe to contain webpage
+	var element	= document.createElement('iframe')
+	// webpage to be loaded into iframe
+	element.src	= "https://lftr.biz/cgi-bin/lftr/broadcast.py#hello";
+	// width of iframe in pixels
+	var elementWidth = 1080;
+	// force iframe to have same relative dimensions as planeGeometry
+	var aspectRatio = planeHeight / planeWidth;
+	var elementHeight = elementWidth * aspectRatio;
+	element.style.width  = elementWidth + "px";
+	element.style.height = elementHeight + "px";
+	
+	// create a CSS3DObject to display element
+	var cssObject = new THREE.CSS3DObject( element );
+	// synchronize cssObject position/rotation with planeMesh position/rotation 
+	cssObject.position = planeMesh.position;
+	cssObject.rotation = planeMesh.rotation;
+	// resize cssObject to same size as planeMesh (plus a border)
+	var percentBorder = 0.05;
+	cssObject.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
+	cssObject.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
+	cssScene.add(cssObject);
+	
+	// create a renderer for CSS
+	rendererCSS	= new THREE.CSS3DRenderer();
+	rendererCSS.setSize( window.innerWidth, window.innerHeight );
+	rendererCSS.domElement.style.position = 'absolute';
+	rendererCSS.domElement.style.top	  = 0;
+	rendererCSS.domElement.style.margin	  = 0;
+	rendererCSS.domElement.style.padding  = 0;
+	document.body.appendChild( rendererCSS.domElement );
+	// when window resizes, also resize this renderer
+	THREEx.WindowResize(rendererCSS, camera);
+
+	renderer.domElement.style.position = 'absolute';
+	renderer.domElement.style.top      = 0;
+	// make sure original renderer appears on top of CSS renderer
+	renderer.domElement.style.zIndex   = 1;
+	rendererCSS.domElement.appendChild( renderer.domElement );
 
 
 
@@ -344,39 +412,72 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
 
 
 
-// floor
 
-                geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-                geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-                for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
-                    var vertex = geometry.vertices[ i ];
-                    vertex.x += Math.random() * 20 - 10;
-                    vertex.y += Math.random() * 2;
-                    vertex.z += Math.random() * 20 - 10;
+	//tvtwo
+	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
+	var planeWidth = 22;
+        var planeHeight = 32;
+	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
+	planeMesh.position.x += 18;
+	planeMesh.position.y += 2;
+	planeMesh.position.z +=-14 ;
+	// add it to the standard (WebGL) scene
+	scene.add(planeMesh);
+	
+	// create a new scene to hold CSS
+	cssScene2 = new THREE.Scene();
+	// create the iframe to contain webpage
+	var element2	= document.createElement('iframe')
+	// webpage to be loaded into iframe
+	element2.src	= "https://lftr.biz/cgi-bin/lftr/screen.py#1111111111111111";
+	// width of iframe in pixels
+	var elementWidth = 1080;
+	// force iframe to have same relative dimensions as planeGeometry
+	var aspectRatio = planeHeight / planeWidth;
+	var elementHeight = elementWidth * aspectRatio;
+	element2.style.width  = elementWidth + "px";
+	element2.style.height = elementHeight + "px";
+	
+	// create a CSS3DObject to display element
+	var cssObject2 = new THREE.CSS3DObject( element2 );
+	// synchronize cssObject position/rotation with planeMesh position/rotation 
+	cssObject2.position = planeMesh.position;
+	cssObject2.rotation = planeMesh.rotation;
+	// resize cssObject to same size as planeMesh (plus a border)
+	var percentBorder = 0.05;
+	cssObject2.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
+	cssObject2.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
+	cssScene2.add(cssObject2);
+	
 
-                }
 
-                for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
-                    var face = geometry.faces[ i ];
-                    face.vertexColors[ 0 ] = new THREE.Color().setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-                    face.vertexColors[ 1 ] = new THREE.Color().setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-                    face.vertexColors[ 2 ] = new THREE.Color().setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 
-                }
 
-                material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-                // material = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505, perPixel: true } );;
 
-                ground = new THREE.Mesh( geometry, material );
-                ground.receiveShadow = true
-                scene.add( ground );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 // // objects
 
-                geometry = new THREE.BoxGeometry( 20, 20, 20 );
+                geometry = new THREE.BoxGeometry( 2, 2, 2 );
 
                 for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
@@ -423,7 +524,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' )
         p.receiveShadow = true;
         p.name = name
         scene.add( p );
-        p.position.y = 300;
+        p.position.y = 0;
         p.position.z = 0;
 
         players.push(name)
@@ -576,5 +677,9 @@ else
 
 
                 renderer.render( scene, camera );
+        	rendererCSS.render( cssScene, camera );
+
+	        rendererCSS.render( cssScene2, camera );
+
             }
         }
