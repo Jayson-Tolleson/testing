@@ -1,11 +1,10 @@
 
-
 window.onload=function(){ 
 
  // best way to un-global this ...? 
      socket = io.connect(); 
 
-
+        
 
             Math.seedrandom('def')
 
@@ -188,27 +187,27 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = 3;
+	floor.position.y = 5;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// FLOOR
 	var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/moontop.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1, 1);
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide} );
 	var floorGeometry = new THREE.PlaneGeometry(400, 400, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = 2;
+	floor.position.y = 4.5;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'sea.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/sea.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1.2,1.2 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = 1.2;
+	floor.position.y = 4.2;
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 
@@ -216,10 +215,27 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	// CUSTOM //
 	////////////
 
+var img = new THREE.MeshBasicMaterial({ //CHANGED to MeshBasicMaterial
+        map:THREE.ImageUtils.loadTexture('/var/www/multiplay/js/moontop.jpg')
+     });
+    img.map.needsUpdate = true; //ADDED
+
+    // plane	
+    var plane = new THREE.Mesh(new THREE.PlaneGeometry(25, 25),img);	
+    plane.overdraw = true;
+
+	plane.position.y = 6;
+	plane.rotation.x = Math.PI / 2;
+
+
+    scene.add(plane);
+
+
+
 
 // axes
-	var axes = new THREE.AxisHelper(100);
-	axes.position.y = 4;
+var axes = new THREE.AxisHelper(100);
+axes.position.y = 5;
 
 	scene.add( axes );
 	
@@ -227,7 +243,6 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
 	var skyGeometry = new THREE.CubeGeometry(500, 500, 500 );	
-	
 	var materialArray = [];
 	for (var i = 0; i < 6; i++)
 		materialArray.push( new THREE.MeshBasicMaterial({
@@ -315,7 +330,29 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	// add it to the standard (WebGL) scene
 	scene.add(planeMesh);
 
-
+// add 3D text
+	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	var materialArray = [ materialFront, materialSide ];
+	var textGeom = new THREE.TextGeometry( "Hello, World!", 
+	{
+		size: 30, height: 4, curveSegments: 3,
+		font: "helvetiker", weight: "bold", style: "normal",
+		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
+		material: 0, extrudeMaterial: 1
+	});
+	// font: helvetiker, gentilis, droid sans, droid serif, optimer
+	// weight: normal, bold
+	
+	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
+	var textMesh = new THREE.Mesh(textGeom, textMaterial );
+	
+	textGeom.computeBoundingBox();
+	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
+	
+	textMesh.position.set( -0.5 * textWidth, 50, 100 );
+	textMesh.rotation.x = -Math.PI / 4;
+	scene.add(textMesh);
 
 	//roof
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.DoubleSide });
@@ -353,16 +390,15 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 
 //tvone
 	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
-	var planeWidth = 32;
-        var planeHeight = 32;
+	var planeWidth = 24;
+        var planeHeight = 24;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
 	planeMesh.position.x += -10;
-	planeMesh.position.y += 2;
+	planeMesh.position.y += 14;
 	planeMesh.position.z +=-14 ;
 	// add it to the standard (WebGL) scene
 	scene.add(planeMesh);
-	
 	// create a new scene to hold CSS
 	cssScene = new THREE.Scene();
 	// create the iframe to contain webpage
@@ -370,7 +406,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	// webpage to be loaded into iframe
 	element.src	= "https://lftr.biz/cgi-bin/lftr/broadcast.py#hello";
 	// width of iframe in pixels
-	var elementWidth = 1080;
+	var elementWidth = 24;
 	// force iframe to have same relative dimensions as planeGeometry
 	var aspectRatio = planeHeight / planeWidth;
 	var elementHeight = elementWidth * aspectRatio;
@@ -387,15 +423,19 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	cssObject.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssObject.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssScene.add(cssObject);
-	
 	// create a renderer for CSS
 	rendererCSS	= new THREE.CSS3DRenderer();
+/**
+
 	rendererCSS.setSize( window.innerWidth, window.innerHeight );
 	rendererCSS.domElement.style.position = 'absolute';
 	rendererCSS.domElement.style.top	  = 0;
 	rendererCSS.domElement.style.margin	  = 0;
 	rendererCSS.domElement.style.padding  = 0;
 	document.body.appendChild( rendererCSS.domElement );
+
+
+
 	// when window resizes, also resize this renderer
 	THREEx.WindowResize(rendererCSS, camera);
 
@@ -410,19 +450,19 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 
 
 
-
+**/
 
 
 
 
 	//tvtwo
 	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
-	var planeWidth = 22;
-        var planeHeight = 32;
+	var planeWidth = 24;
+        var planeHeight = 24;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
-	planeMesh.position.x += 18;
-	planeMesh.position.y += 2;
+	planeMesh.position.x += 18.4;
+	planeMesh.position.y += 14;
 	planeMesh.position.z +=-14 ;
 	// add it to the standard (WebGL) scene
 	scene.add(planeMesh);
@@ -432,9 +472,9 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	// create the iframe to contain webpage
 	var element2	= document.createElement('iframe')
 	// webpage to be loaded into iframe
-	element2.src	= "https://lftr.biz/cgi-bin/lftr/screen.py#1111111111111111";
+	element2.src	= "https://lftr.biz/map.html";
 	// width of iframe in pixels
-	var elementWidth = 1080;
+	var elementWidth = 24;
 	// force iframe to have same relative dimensions as planeGeometry
 	var aspectRatio = planeHeight / planeWidth;
 	var elementHeight = elementWidth * aspectRatio;
@@ -452,8 +492,6 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	cssObject2.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssScene2.add(cssObject2);
 	
-
-
 
 
 
