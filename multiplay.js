@@ -181,7 +181,7 @@ if (!slave) slave = 0
 //
 //
 //
-var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/checkerboard.jpg' );
+var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 10, 10 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -191,7 +191,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/moontop.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'js/moontop.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1, 1);
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide} );
@@ -201,7 +201,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	floor.rotation.x = Math.PI / 2;
 	scene.add(floor);
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/sea.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'js/sea.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1.2,1.2 );
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -215,31 +215,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( '/var/www/multiplay/js/chec
 	// CUSTOM //
 	////////////
 
-var img = new THREE.MeshBasicMaterial({ //CHANGED to MeshBasicMaterial
-        map:THREE.ImageUtils.loadTexture('/var/www/multiplay/js/moontop.jpg')
-     });
-    img.map.needsUpdate = true; //ADDED
-
-    // plane	
-    var plane = new THREE.Mesh(new THREE.PlaneGeometry(25, 25),img);	
-    plane.overdraw = true;
-
-	plane.position.y = 6;
-	plane.rotation.x = Math.PI / 2;
-
-
-    scene.add(plane);
-
-
-
-
-// axes
-var axes = new THREE.AxisHelper(100);
-axes.position.y = 5;
-
-	scene.add( axes );
-	
-	var imagePrefix = "/var/www/multiplay/js/dawnmountain-";
+	var imagePrefix = "js/dawnmountain-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
 	var skyGeometry = new THREE.CubeGeometry(500, 500, 500 );	
@@ -253,7 +229,7 @@ axes.position.y = 5;
 	var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
 	scene.add( skyBox );
 	
-	var imagePrefix = "nebula-";
+	var imagePrefix = "js/nebula-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
 	var skyGeometry = new THREE.CubeGeometry(1000, 498, 1000 );	
@@ -387,26 +363,29 @@ axes.position.y = 5;
 //                
 
 ///TV.s/// //tvone 
-
-//tvone
+////////////
+	// CUSTOM //
+	////////////
+	
 	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
-	var planeWidth = 24;
-        var planeHeight = 24;
+	var planeWidth =24;
+    var planeHeight = 24;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
+	planeMesh.position.y += planeHeight/2;
+	// add it to the standard (WebGL) scene
+	
 	planeMesh.position.x += -10;
 	planeMesh.position.y += 14;
-	planeMesh.position.z +=-14 ;
-	// add it to the standard (WebGL) scene
-	scene.add(planeMesh);
+	planeMesh.position.z +=-14 ;    
 	// create a new scene to hold CSS
 	cssScene = new THREE.Scene();
 	// create the iframe to contain webpage
 	var element	= document.createElement('iframe')
 	// webpage to be loaded into iframe
-	element.src	= "https://lftr.biz/cgi-bin/lftr/broadcast.py#hello";
+	element.src	= "http://stemkoski.github.io/Three.js/index.html";
 	// width of iframe in pixels
-	var elementWidth = 24;
+	var elementWidth = 1024;
 	// force iframe to have same relative dimensions as planeGeometry
 	var aspectRatio = planeHeight / planeWidth;
 	var elementHeight = elementWidth * aspectRatio;
@@ -423,19 +402,15 @@ axes.position.y = 5;
 	cssObject.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssObject.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssScene.add(cssObject);
+	
 	// create a renderer for CSS
 	rendererCSS	= new THREE.CSS3DRenderer();
-/**
-
 	rendererCSS.setSize( window.innerWidth, window.innerHeight );
 	rendererCSS.domElement.style.position = 'absolute';
 	rendererCSS.domElement.style.top	  = 0;
 	rendererCSS.domElement.style.margin	  = 0;
 	rendererCSS.domElement.style.padding  = 0;
 	document.body.appendChild( rendererCSS.domElement );
-
-
-
 	// when window resizes, also resize this renderer
 	THREEx.WindowResize(rendererCSS, camera);
 
@@ -444,76 +419,21 @@ axes.position.y = 5;
 	// make sure original renderer appears on top of CSS renderer
 	renderer.domElement.style.zIndex   = 1;
 	rendererCSS.domElement.appendChild( renderer.domElement );
-
-
-
-
-
-
-**/
+	
+		    
+		    
+		    
+		
 
 
 
 
 	//tvtwo
-	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
-	var planeWidth = 24;
-        var planeHeight = 24;
-	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
-	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
-	planeMesh.position.x += 18.4;
-	planeMesh.position.y += 14;
-	planeMesh.position.z +=-14 ;
-	// add it to the standard (WebGL) scene
-	scene.add(planeMesh);
-	
-	// create a new scene to hold CSS
-	cssScene2 = new THREE.Scene();
-	// create the iframe to contain webpage
-	var element2	= document.createElement('iframe')
-	// webpage to be loaded into iframe
-	element2.src	= "https://lftr.biz/map.html";
-	// width of iframe in pixels
-	var elementWidth = 24;
-	// force iframe to have same relative dimensions as planeGeometry
-	var aspectRatio = planeHeight / planeWidth;
-	var elementHeight = elementWidth * aspectRatio;
-	element2.style.width  = elementWidth + "px";
-	element2.style.height = elementHeight + "px";
-	
-	// create a CSS3DObject to display element
-	var cssObject2 = new THREE.CSS3DObject( element2 );
-	// synchronize cssObject position/rotation with planeMesh position/rotation 
-	cssObject2.position = planeMesh.position;
-	cssObject2.rotation = planeMesh.rotation;
-	// resize cssObject to same size as planeMesh (plus a border)
-	var percentBorder = 0.05;
-	cssObject2.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
-	cssObject2.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
-	cssScene2.add(cssObject2);
-	
+	//planeMesh.position.x += 18.4;
+//	planeMesh.position.y += 14;
+//	planeMesh.position.z +=-14 ;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                // // objects
+		    // // objects
 
                 geometry = new THREE.BoxGeometry( 2, 2, 2 );
 
