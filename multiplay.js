@@ -1,4 +1,5 @@
 
+
 window.onload=function(){ 
 
  // best way to un-global this ...? 
@@ -17,6 +18,9 @@ window.onload=function(){
 var rendererCSS;
 // custom global variables
 var cube;
+
+// custom global variables 
+var cube; var parameters; var gui;
 
 
             scene = '';
@@ -155,8 +159,8 @@ if (!slave) slave = 0
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
 
                 scene = new THREE.Scene();
-                scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
-                scene.fog.color.setHSL( 0.6, 0, 1 );
+                scene.fog = new THREE.Fog( 0x0000CD, 0, 420 );
+                scene.fog.color.setHSL( 0.6, 1, 1 );
 
                 controls = new THREE.PointerLockControls( camera );
                 scene.add( controls.getObject() );
@@ -176,6 +180,70 @@ if (!slave) slave = 0
                 var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
                 light.position.set( -1, - 0.5, -1 );
                 scene.add( light );
+
+
+//GUI//
+
+
+
+
+
+
+
+
+////////////
+	// CUSTOM //
+	////////////
+	var cubeGeometry = new THREE.CubeGeometry( 50, 50, 50 );
+	var cubeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088 } );
+	cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+	cube.position.set(0,26,0);
+	scene.add(cube);
+	
+	var gui = new dat.GUI();
+	
+	var parameters = 
+	{
+		a: 200, // numeric
+		b: 200, // numeric slider
+		c: "Hello, i am on lftr.biz!!!!", // string
+		d: false, // boolean (checkbox)
+		e: "#ff8800", // color (hex)
+		f: function() { alert("Hello!") },
+		g: function() { alert( parameters.c ) },
+		v : 0,    // dummy value, only type is important
+		w: "...", // dummy value, only type is important
+		x: 0, y: 0, z: 0
+	};
+	// gui.add( parameters )
+	gui.add( parameters, 'a' ).name('Number');
+	gui.add( parameters, 'b' ).min(128).max(256).step(16).name('Slider');
+	gui.add( parameters, 'c' ).name('String');
+	gui.add( parameters, 'd' ).name('Boolean');
+	
+	gui.addColor( parameters, 'e' ).name('Color');
+	
+	var numberList = [1, 2, 3];
+	gui.add( parameters, 'v', numberList ).name('List');
+	
+	var stringList = ["One", "Two", "Three"];
+	gui.add( parameters, 'w', stringList ).name('List');
+	
+	gui.add( parameters, 'f' ).name('Say "Hello!"');
+	gui.add( parameters, 'g' ).name("Alert Message");
+	
+	var folder1 = gui.addFolder('Coordinates');
+	folder1.add( parameters, 'x' );
+	folder1.add( parameters, 'y' );
+	folder1.close();
+	gui.open();
+	
+
+
+
+
+
+
                 
 /*moontop*/
 //
@@ -194,7 +262,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'js/moontop.jpg' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1, 1);
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide} );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
 	var floorGeometry = new THREE.PlaneGeometry(400, 400, 10, 10);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
 	floor.position.y = 4.5;
@@ -215,10 +283,13 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	// CUSTOM //
 	////////////
 
+
+	
 	var imagePrefix = "js/dawnmountain-";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
 	var skyGeometry = new THREE.CubeGeometry(500, 500, 500 );	
+	
 	var materialArray = [];
 	for (var i = 0; i < 6; i++)
 		materialArray.push( new THREE.MeshBasicMaterial({
@@ -306,29 +377,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	// add it to the standard (WebGL) scene
 	scene.add(planeMesh);
 
-// add 3D text
-	var materialFront = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-	var materialSide = new THREE.MeshBasicMaterial( { color: 0x000088 } );
-	var materialArray = [ materialFront, materialSide ];
-	var textGeom = new THREE.TextGeometry( "Hello, World!", 
-	{
-		size: 30, height: 4, curveSegments: 3,
-		font: "helvetiker", weight: "bold", style: "normal",
-		bevelThickness: 1, bevelSize: 2, bevelEnabled: true,
-		material: 0, extrudeMaterial: 1
-	});
-	// font: helvetiker, gentilis, droid sans, droid serif, optimer
-	// weight: normal, bold
-	
-	var textMaterial = new THREE.MeshFaceMaterial(materialArray);
-	var textMesh = new THREE.Mesh(textGeom, textMaterial );
-	
-	textGeom.computeBoundingBox();
-	var textWidth = textGeom.boundingBox.max.x - textGeom.boundingBox.min.x;
-	
-	textMesh.position.set( -0.5 * textWidth, 50, 100 );
-	textMesh.rotation.x = -Math.PI / 4;
-	scene.add(textMesh);
+
 
 	//roof
         var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, side: THREE.DoubleSide });
@@ -363,29 +412,26 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 //                
 
 ///TV.s/// //tvone 
-////////////
-	// CUSTOM //
-	////////////
-	
+
+//tvone
 	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
-	var planeWidth =24;
-    var planeHeight = 24;
+	var planeWidth = 24;
+        var planeHeight = 24;
 	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
-	planeMesh.position.y += planeHeight/2;
-	// add it to the standard (WebGL) scene
-	
 	planeMesh.position.x += -10;
 	planeMesh.position.y += 14;
-	planeMesh.position.z +=-14 ;    
+	planeMesh.position.z +=-14 ;
+	// add it to the standard (WebGL) scene
+	scene.add(planeMesh);
 	// create a new scene to hold CSS
 	cssScene = new THREE.Scene();
 	// create the iframe to contain webpage
 	var element	= document.createElement('iframe')
 	// webpage to be loaded into iframe
-	element.src	= "http://stemkoski.github.io/Three.js/index.html";
+	element.src	= "https://lftr.biz/cgi-bin/lftr/broadcast.py#hello";
 	// width of iframe in pixels
-	var elementWidth = 1024;
+	var elementWidth = 24;
 	// force iframe to have same relative dimensions as planeGeometry
 	var aspectRatio = planeHeight / planeWidth;
 	var elementHeight = elementWidth * aspectRatio;
@@ -402,15 +448,19 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	cssObject.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssObject.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
 	cssScene.add(cssObject);
-	
 	// create a renderer for CSS
 	rendererCSS	= new THREE.CSS3DRenderer();
+/**
+
 	rendererCSS.setSize( window.innerWidth, window.innerHeight );
 	rendererCSS.domElement.style.position = 'absolute';
 	rendererCSS.domElement.style.top	  = 0;
 	rendererCSS.domElement.style.margin	  = 0;
 	rendererCSS.domElement.style.padding  = 0;
 	document.body.appendChild( rendererCSS.domElement );
+
+
+
 	// when window resizes, also resize this renderer
 	THREEx.WindowResize(rendererCSS, camera);
 
@@ -419,23 +469,78 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	// make sure original renderer appears on top of CSS renderer
 	renderer.domElement.style.zIndex   = 1;
 	rendererCSS.domElement.appendChild( renderer.domElement );
-	
-		    
-		    
-		    
-		
+
+
+
+
+
+
+**/
 
 
 
 
 	//tvtwo
-	//planeMesh.position.x += 18.4;
-//	planeMesh.position.y += 14;
-//	planeMesh.position.z +=-14 ;
+	var planeMaterial   = new THREE.MeshBasicMaterial({color: 0x000000, opacity: 0.1, side: THREE.DoubleSide });
+	var planeWidth = 24;
+        var planeHeight = 24;
+	var planeGeometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+	var planeMesh= new THREE.Mesh( planeGeometry, planeMaterial );
+	planeMesh.position.x += 18.4;
+	planeMesh.position.y += 14;
+	planeMesh.position.z +=-14 ;
+	// add it to the standard (WebGL) scene
+	scene.add(planeMesh);
+	
+	// create a new scene to hold CSS
+	cssScene2 = new THREE.Scene();
+	// create the iframe to contain webpage
+	var element2	= document.createElement('iframe')
+	// webpage to be loaded into iframe
+	element2.src	= "https://lftr.biz/map.html";
+	// width of iframe in pixels
+	var elementWidth = 24;
+	// force iframe to have same relative dimensions as planeGeometry
+	var aspectRatio = planeHeight / planeWidth;
+	var elementHeight = elementWidth * aspectRatio;
+	element2.style.width  = elementWidth + "px";
+	element2.style.height = elementHeight + "px";
+	
+	// create a CSS3DObject to display element
+	var cssObject2 = new THREE.CSS3DObject( element2 );
+	// synchronize cssObject position/rotation with planeMesh position/rotation 
+	cssObject2.position = planeMesh.position;
+	cssObject2.rotation = planeMesh.rotation;
+	// resize cssObject to same size as planeMesh (plus a border)
+	var percentBorder = 0.05;
+	cssObject2.scale.x /= (1 + percentBorder) * (elementWidth / planeWidth);
+	cssObject2.scale.y /= (1 + percentBorder) * (elementWidth / planeWidth);
+	cssScene2.add(cssObject2);
+	
 
-		    // // objects
 
-                geometry = new THREE.BoxGeometry( 2, 2, 2 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // // objects
+
+                geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
                 for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
@@ -448,7 +553,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 
                 for ( var i = 0; i < 500; i ++ ) {
 
-                    material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
+                    material = new THREE.MeshPhongMaterial( { specular: 0x0000ff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
 
                     var mesh = new THREE.Mesh( geometry, material );
                     mesh.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
@@ -474,7 +579,7 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
         var p = new THREE.Mesh(
             new THREE.BoxGeometry(5, 10, 5),
             new THREE.MeshBasicMaterial({
-                color: 0x0000ff,
+                color: 0x0047AB,
                 wireframe: false
             })
         );
