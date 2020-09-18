@@ -351,11 +351,9 @@ scene.add( player );
 	renderer.setClearColor( 0x000000, 1 );
 	renderer.autoClear = false;
 
+                // // objects
 
 
-
-
-                
 /*moontop*/
 //
 //
@@ -645,11 +643,6 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 
 
 
-
-
-
-
-                // // objects
 
 
 
