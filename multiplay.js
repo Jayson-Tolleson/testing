@@ -1,5 +1,3 @@
-
-
 window.onload=function(){ 
 
  // best way to un-global this ...? 
@@ -9,9 +7,57 @@ window.onload=function(){
 
             Math.seedrandom('def')
 
-            var players = [];
 
-            var stats;
+
+
+
+
+navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.getUserMedia;
+window.URL = window.URL || window.webkitURL;
+
+var camvideo = document.getElementById('monitor');
+
+	if (!navigator.getUserMedia) 
+	{
+		document.getElementById('errorMessage').innerHTML = 
+			'Sorry. <code>navigator.getUserMedia()</code> is not available.';
+		return;
+	}
+	navigator.getUserMedia({video: true}, gotStream, noStream);
+
+function gotStream(stream) 
+{
+	if (window.URL) 
+	{   camvideo.src = window.URL.createObjectURL(stream);   } 
+	else // Opera
+	{   camvideo.src = stream;   }
+
+	camvideo.onerror = function(e) 
+	{   stream.stop();   };
+
+	stream.onended = noStream;
+}
+
+function noStream(e) 
+{
+	var msg = 'No camera available.';
+	if (e.code == 1) 
+	{   msg = 'User denied access to use camera.';   }
+	document.getElementById('errorMessage').textContent = msg;
+}
+
+
+
+
+// MAIN
+
+// standard global variables
+var container, scene, camera, renderer, controls, stats;
+var keyboard = new THREEx.KeyboardState();
+var clock = new THREE.Clock();
+
+// custom global variables
+var video, videoImage, videoImageContext, videoTexture;
 
 
 // custom global variables
@@ -23,183 +69,83 @@ var cube;
 var cube; var parameters; var gui;
 
 
-            scene = '';
-            var camera, renderer //, scene;
-            var geometry, material, mesh;
-            var controls;
-
-            var objects = [];
-
-            var ray;
-            var camera;
-
-
-            var blocker = document.getElementById( 'blocker' );
-            var instructions = document.getElementById( 'instructions' );
-
-            // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
-
-            var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-
-            if ( havePointerLock ) {
-
-                var element = document.body;
-
-                var pointerlockchange = function ( event ) {
-
-                    if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-
-                        controls.enabled = true;
-
-                        blocker.style.display = 'none';
-
-                    } else {
-
-                        controls.enabled = false;
-
-                        blocker.style.display = '-webkit-box';
-                        blocker.style.display = '-moz-box';
-                        blocker.style.display = 'box';
-
-                        instructions.style.display = '';
-
-                    }
-
-                }
-
-                var pointerlockerror = function ( event ) {
-
-                    instructions.style.display = '';
-
-                }
-
-                // Hook pointer lock state change events
-                document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-                document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-                document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
-
-                document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-                document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-                document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
-
-                instructions.addEventListener( 'click', function ( event ) {
-
-                    instructions.style.display = 'none';
-
-                    // Ask the browser to lock the pointer
-                    element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-                    // if ( /Firefox/i.test( navigator.userAgent ) ) {
-
-                    //     var fullscreenchange = function ( event ) {
-
-                    //         if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-
-                    //             document.removeEventListener( 'fullscreenchange', fullscreenchange );
-                    //             document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-
-                    //             element.requestPointerLock();
-                    //         }
-
-                    //     }
-
-                    //     document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-                    //     document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-
-                    //     element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-
-                    //     element.requestFullscreen();
-
-                    // } else {
-
-                        element.requestPointerLock();
-
-                    // }
-
-                }, false );
-
-            } else {
-
-                instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-
-            }
-
-
-
-
-// var toggle = false;
-// var onKeyUp = function ( event ) {
-//     switch( event.keyCode ) {
-//         case 66: // b
-//         console.log('toogggle')
-//             toggle = !toggle;
-//             break;
-//     }
-// };
-// document.addEventListener( 'keyup', onKeyUp, false );
-
-
-            init();
-            animate();
-
-            function init() {
-me = getUrlVars()["me"];
-
-angle = parseFloat(getUrlVars()["angle"], 10);
-if (isNaN(angle)) {
-    angle = 0.0;
-}
-console.log(angle)
-
-slave = getUrlVars()["slave"];
-if (!slave) slave = 0
-
-
-
-                camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-
-                scene = new THREE.Scene();
-                scene.fog = new THREE.Fog( 0x0000CD, 0, 420 );
-                scene.fog.color.setHSL( 0.6, 1, 1 );
-
-                controls = new THREE.PointerLockControls( camera );
-                scene.add( controls.getObject() );
-                if (slave === 0)
-                {
-                    ray = new THREE.Raycaster();
-                    ray.ray.direction.set( 0, -1, 0 );
-
-                }
-
-
-
-                var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
-                light.position.set( 1, 1, 1 );
-                scene.add( light );
-
-                var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
-                light.position.set( -1, - 0.5, -1 );
-                scene.add( light );
-
-
-//GUI//
-
-
-
-
-
-
-
-
-////////////
-	// CUSTOM //
-	////////////
-	var cubeGeometry = new THREE.CubeGeometry( 50, 50, 50 );
+var player = new THREE.Object3D();
+
+init();
+animate();
+
+// FUNCTIONS 		
+function init() 
+{
+	// SCENE
+	scene = new THREE.Scene();
+	// CAMERA
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	scene.add(camera);
+	camera.position.set(0,0,400);
+	camera.lookAt(scene.position);	
+	// RENDERER
+	if ( Detector.webgl )
+		renderer = new THREE.WebGLRenderer( { antialias:true } );
+	else
+		renderer = new THREE.CanvasRenderer(); 
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	container = document.createElement( 'div' );
+	// CSS added so the hidden HTML elements do not reposition this one
+	container.style.cssText = "position:absolute;top:0px;left:0px;";
+	document.body.appendChild( container );
+	container.appendChild( renderer.domElement );
+	// CONTROLS
+	// disabled for manual repositioning of camera.
+	//  controls = new THREE.TrackballControls( camera );
+	// EVENTS
+	THREEx.WindowResize(renderer, camera);
+	THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+	// STATS
+	stats = new Stats();
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.bottom = '0px';
+	stats.domElement.style.zIndex = 100;
+	container.appendChild( stats.domElement );
+	// LIGHT
+	var light = new THREE.PointLight(0xffffff);
+	light.position.set(0,250,0);
+	scene.add(light);
+//moontop//
+
+
+//GUI// 
+
+
+
+
+var cubeGeometry = new THREE.CubeGeometry( 5, 5, 5 );
 	var cubeMaterial = new THREE.MeshBasicMaterial( { color: 0x000088 } );
 	cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
-	cube.position.set(0,26,0);
+	cube.position.set(0,6,0);
 	scene.add(cube);
-	
+
+
+
+////////add player
+
+
+
+	scene.add( player );
+
+
+
+
+
+
+
+//gui
+
+
+
+
 	var gui = new dat.GUI();
 	
 	var parameters = 
@@ -215,6 +161,8 @@ if (!slave) slave = 0
 		w: "...", // dummy value, only type is important
 		x: 0, y: 0, z: 0
 	};
+
+
 	// gui.add( parameters )
 	gui.add( parameters, 'a' ).name('Number');
 	gui.add( parameters, 'b' ).min(128).max(256).step(16).name('Slider');
@@ -237,7 +185,8 @@ if (!slave) slave = 0
 	folder1.add( parameters, 'y' );
 	folder1.close();
 	gui.open();
-	
+
+
 
 
 
@@ -406,11 +355,6 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 	planeMesh.rotation.y = 0;
 	// add it to the standard (WebGL) scene
 	scene.add(planeMesh);
-
-//
-//
-//                
-
 ///TV.s/// //tvone 
 
 //tvone
@@ -527,78 +471,51 @@ var floorTexture = new THREE.ImageUtils.loadTexture( 'js/checkerboard.jpg' );
 
 
 
+//add the player
+
+	
+	scene.add( player );
+	
+	///////////
+	// VIDEO //
+	///////////
+
+	video = document.getElementById( 'monitor' );
+	
+	videoImage = document.getElementById( 'videoImage' );
+	videoImageContext = videoImage.getContext( '2d' );
+	// background color if no video present
+	videoImageContext.fillStyle = '#000000';
+	videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
+
+	videoTexture = new THREE.Texture( videoImage );
+	videoTexture.minFilter = THREE.LinearFilter;
+	videoTexture.magFilter = THREE.LinearFilter;
+	
+	var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+	// the geometry on which the movie will be displayed;
+	var movieGeometry = new THREE.PlaneGeometry( 100, 100, 1, 1 );
+	// attach video to a mesh that will move with the camera
+	this.movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
+
+	// add a frame to the image.
+	var frameGeo = new THREE.CubeGeometry(120, 120, 20);
+	var frameMat = new THREE.MeshLambertMaterial( {color:0x888888, emissive:0x000011} );
+	this.frameMesh = new THREE.Mesh( frameGeo, frameMat );
+	
+	// "attach" player to camera
+	player.position = camera.position;
+	player.rotation = camera.rotation;
+	player.add( movieScreen );
+	player.add( frameMesh );
+	// position the movieScreen so it is attached
+	//   to the front and center of the frameMesh
+	movieScreen.position.y = 5;
+	movieScreen.position.z = -12;
+}	
 
 
-
-
-
-
-
-
-
-
-
-                // // objects
-
-                geometry = new THREE.BoxGeometry( 1, 1, 1 );
-
-                for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-                    var face = geometry.faces[ i ];
-                    face.vertexColors[ 0 ] = new THREE.Color().setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-                    face.vertexColors[ 1 ] = new THREE.Color().setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-                    face.vertexColors[ 2 ] = new THREE.Color().setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-
-                }
-
-                for ( var i = 0; i < 500; i ++ ) {
-
-                    material = new THREE.MeshPhongMaterial( { specular: 0x0000ff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
-
-                    var mesh = new THREE.Mesh( geometry, material );
-                    mesh.position.x = Math.floor( Math.random() * 20 - 10 ) * 20;
-                    mesh.position.y = Math.floor( Math.random() * 20 ) * 20 + 10;
-                    mesh.position.z = Math.floor( Math.random() * 20 - 10 ) * 20;
-
-                    mesh.receiveShadow = true;
-                    mesh.castShadow = true;
-                    scene.add( mesh );
-
-                    material.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-
-                    objects.push( mesh );
-
-                }
-
-                //
-
-
-
-
-    createThing = function(name) {  
-        var p = new THREE.Mesh(
-            new THREE.BoxGeometry(5, 10, 5),
-            new THREE.MeshBasicMaterial({
-                color: 0x0047AB,
-                wireframe: false
-            })
-        );
-        p.castShadow = true;
-        p.receiveShadow = true;
-        p.name = name
-        scene.add( p );
-        p.position.y = 0;
-        p.position.z = 0;
-
-        players.push(name)
-    }
-
-    deleteThing = function(name) {
-        scene.remove(scene.getObjectByName(name))
-    }
-
-
-    socket.on('m4', function(data) {
+ socket.on('m4', function(data) {
         // new player
         obj = JSON.parse(data);
         console.log('received new player: ' + obj.name)
@@ -672,77 +589,103 @@ socket.on('disconnect', function() {
 });
 
 
-if (window.WebGLRenderingContext)
-    renderer = new THREE.WebGLRenderer();
-                // renderer = new THREE.WebGLRenderer( { antialias: true } );
-else
-    renderer = new THREE.CanvasRenderer();
-
-                renderer.setSize( window.innerWidth, window.innerHeight );
-                document.body.appendChild( renderer.domElement );
-
-                renderer.setClearColor( scene.fog.color, 1 );
-
-                renderer.gammaInput = true;
-                renderer.gammaOutput = true;
-
-                renderer.shadowMapEnabled = true;
-                renderer.shadowMapCullFace = THREE.CullFaceBack;
-
-                stats = new Stats();
-                setInterval( function () {
-                    stats.begin();
-                    // your code goes here
-                    stats.end();
-                }, 1000 / 60 );
-                document.body.appendChild( stats.domElement );
-
-                window.addEventListener( 'resize', onWindowResize, false );
-
-            }
-
-            function onWindowResize() {
-
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-
-                renderer.setSize( window.innerWidth, window.innerHeight );
-                // effect.setSize( window.innerWidth, window.innerHeight  );
-
-            }
-            function animate() {
-
-                requestAnimationFrame( animate );
-
-                if (slave === 0)
-                {
-                    controls.isOnObject( false );
-
-                    ray.ray.origin.copy( controls.getObject().position );
-                    ray.ray.origin.y -= 10;
-
-                    var intersections = ray.intersectObjects( objects );
-
-                    if ( intersections.length > 0 ) {
-                        var distance = intersections[ 0 ].distance;
-                        if ( distance > 0 && distance < 10 ) {
-                            controls.isOnObject( true );
-                        }
-                    }
-
-                    controls.update();
-// if (me === 'u2')
-// {
-//     console.log(camera)
-// }
-
-                }
 
 
-                renderer.render( scene, camera );
-        	rendererCSS.render( cssScene, camera );
 
-	        rendererCSS.render( cssScene2, camera );
+function animate() 
+{
+    requestAnimationFrame( animate );
+	render();		
+	update();
+}
 
-            }
-        }
+function update()
+{		
+	if ( keyboard.pressed("p") ) // pause webcam
+		video.pause();
+	if ( keyboard.pressed("r") ) // resume webcam
+		video.play();
+		
+	var delta = clock.getDelta(); // seconds.
+	var moveDistance = 100 * delta; // 100 pixels per second
+	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
+
+	var previousPosition = camera.position.clone();
+	var previousRotation = camera.rotation.clone();
+	
+	// move forwards/backwards/left/right (local coordinates)
+	if ( keyboard.pressed("W") )
+		camera.translateZ( -moveDistance );
+	if ( keyboard.pressed("S") )
+		camera.translateZ(  moveDistance );
+	if ( keyboard.pressed("Q") )
+		camera.translateX( -moveDistance );
+	if ( keyboard.pressed("E") )
+		camera.translateX(  moveDistance );	
+
+	// rotate left/right/up/down
+	if ( keyboard.pressed("A") )
+		camera.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
+	if ( keyboard.pressed("D") )
+		camera.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
+	
+	var d = camera.position.distanceTo( mirrorSphere.position );
+	if ( d > 500 || d < 60 )
+	{
+		camera.position = previousPosition;
+		camera.rotation = previousRotation;
+		player.position = camera.position;
+		player.rotation = camera.rotation;
+	}
+	
+	stats.update();
+}
+
+function render() 
+{	
+	// update image from webcam
+	if ( video.readyState === video.HAVE_ENOUGH_DATA ) 
+	{
+		videoImageContext.drawImage( video, 0, 0, videoImage.width, videoImage.height );
+		if ( videoTexture ) 
+			videoTexture.needsUpdate = true;
+	}
+
+	// update cameras
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+	camera.updateProjectionMatrix();
+	topCamera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+	topCamera.updateProjectionMatrix();
+
+	// setViewport parameters:
+	//  lower_left_x, lower_left_y, viewport_width, viewport_height
+	renderer.setViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
+	//renderer.clear();
+	
+	// left side
+	renderer.setViewport( 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
+	
+	// move the CubeCamera to the position of the object
+	//    that has a reflective surface, "take a picture" in each direction
+	//    and apply it to the surface.
+	// need to hide mirror surface before and after so that it does not
+	//    "get in the way" of the camera
+	movieScreen.visible = true;
+	mirrorSphere.visible = false;
+	
+	renderer.autoClear = true;		
+	mirrorSphereCamera.updateCubeMap( renderer, scene );
+	renderer.autoClear = false;
+	
+	mirrorSphere.visible = true;
+	movieScreen.visible = false;
+	renderer.render( scene, camera );
+
+	// right side
+	movieScreen.visible = true;
+	mirrorSphere.visible = true;
+	renderer.setViewport( 0.5 * SCREEN_WIDTH + 1, 1,   0.5 * SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2 );
+	renderer.render( scene, topCamera );	
+}
+}
